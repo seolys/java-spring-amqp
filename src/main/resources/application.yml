@@ -7,5 +7,5 @@ spring:
     #    host: b-9562e88e-c036-4542-9b3e-3a6c3a63361b.mq.ap-northeast-2.amazonaws.com
     #    port: 5671
     addresses: amqps://b-9562e88e-c036-4542-9b3e-3a6c3a63361b.mq.ap-northeast-2.amazonaws.com:5671
-    username: test
-    password: test1234
+    username: ${STUDY_ID}
+    password: ${STUDY_PASSWORD}
