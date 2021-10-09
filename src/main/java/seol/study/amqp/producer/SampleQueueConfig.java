@@ -11,14 +11,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SampleQueueConfig {
 
-	public static final String SAMPLE_EXCHANGE_NAME = "sample.exchange";
-	public static final String SAMPLE_QUEUE_NAME = "sample.queue";
-	public static final String SAMPLE_ROUTING_KEY = "sample.queue";
+	public static final String SAMPLE_EXCHANGE_NAME = "sample.topic.exchange";
+	public static final String SAMPLE_QUEUE_NAME = "sample.topic.queue";
+	public static final String SAMPLE_ROUTING_KEY = "sample.topic.queue";
 	public static final String SAMPLE_DURABLE = "true";
 
-	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.exchange.dlx";
-	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.queue.dlx";
-	public static final String SAMPLE_ROUTING_DLX_KEY = "sample.queue.dlx";
+	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.topic.exchange.dlx";
+	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.topic.queue.dlx";
+	public static final String SAMPLE_ROUTING_DLX_KEY = "sample.topic.queue.dlx";
 	public static final String SAMPLE_DLX_DURABLE = "true";
 
 	/**
