@@ -2,7 +2,7 @@ package seol.study.amqp.producer;
 
 import static java.lang.Boolean.valueOf;
 
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -87,8 +87,8 @@ public class SampleQueueConfig {
 
 	@Bean
 	public String localServerIp() throws UnknownHostException {
-		InetAddress ip = InetAddress.getLocalHost();
-		return ip.getHostAddress();
+//		return InetAddress.getLocalHost().getHostAddress();
+		return Inet4Address.getLocalHost().getHostAddress();
 	}
 
 	@Bean
