@@ -16,13 +16,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SampleQueueConfig {
 
-	public static final String SAMPLE_EXCHANGE_NAME = "sample.exchange";
-	public static final String SAMPLE_QUEUE_BASE_NAME = "sample.queue.";
+	public static final String SAMPLE_EXCHANGE_NAME = "sample.fanout.exchange";
+	public static final String SAMPLE_QUEUE_BASE_NAME = "sample.fanout.queue.";
 	public static final String SAMPLE_DURABLE = "true";
 	public static final String SAMPLE_AUTO_DELETE = "true";
 
-	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.exchange.dlx";
-	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.queue.dlx";
+	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.fanout.exchange.dlx";
+	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.fanout.queue.dlx";
 	public static final String SAMPLE_DLX_DURABLE = "true";
 	public static final String SAMPLE_DLX_AUTO_DELETE = "false";
 
