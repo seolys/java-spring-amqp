@@ -21,11 +21,7 @@ public class SampleQueueConfig {
 	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.exchange.dlx";
 	public static final String SAMPLE_QUEUE_DLX_BASE_NAME = "sample.queue.dlx.";
 	public static final String SAMPLE_DLX_DURABLE = "true";
-
-	/**
-	 * 지정된 이름으로 Queue를 등록합니다.
-	 * 서로 다른 이름으로 여러개의 Queue를 등록할 수도 있습니다.
-	 */
+	
 	@Bean(name = "sampleQueue")
 	Queue sampleQueue(@Value("#{sampleQueueName}") String sampleQueueName) {
 		Queue queue = new Queue(
@@ -38,11 +34,6 @@ public class SampleQueueConfig {
 		return queue;
 	}
 
-	/**
-	 * Exchange를 설정합니다.
-	 * 위 코드에서는 TopicExchange를 사용해 주어진 패턴과 일치하는 Queue에 메시지를 전달합니다.
-	 * 설정할 수 있는 Exchange에는 Direct, Fanout, Topic, Headers가 있습니다.
-	 */
 	@Bean(name = "sampleExchange")
 	FanoutExchange sampleExchange() {
 //		return new TopicExchange(
@@ -57,10 +48,6 @@ public class SampleQueueConfig {
 		);
 	}
 
-	/**
-	 * Exchange가 Queue에게 메시지를 전달하기 위한 룰입니다.
-	 * 빈으로 등록한 Queue와 Exchange를 바인딩하면서 Exchange에서 사용될 패턴을 설정해 주었습니다.
-	 */
 	@Bean(name = "sampleBinding")
 	Binding sampleBinding(@Qualifier("sampleQueue") Queue queue, @Qualifier("sampleExchange") FanoutExchange exchange) {
 		return BindingBuilder.bind(queue)
