@@ -1,5 +1,7 @@
 package seol.study.amqp.producer;
 
+import static java.lang.Boolean.valueOf;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.springframework.amqp.core.Binding;
@@ -17,18 +19,21 @@ public class SampleQueueConfig {
 	public static final String SAMPLE_EXCHANGE_NAME = "sample.exchange";
 	public static final String SAMPLE_QUEUE_BASE_NAME = "sample.queue.";
 	public static final String SAMPLE_DURABLE = "true";
+	public static final String SAMPLE_AUTO_DELETE = "true";
 
 	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.exchange.dlx";
-	public static final String SAMPLE_QUEUE_DLX_BASE_NAME = "sample.queue.dlx.";
+	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.queue.dlx";
 	public static final String SAMPLE_DLX_DURABLE = "true";
-	
+	public static final String SAMPLE_DLX_AUTO_DELETE = "false";
+
+
 	@Bean(name = "sampleQueue")
 	Queue sampleQueue(@Value("#{sampleQueueName}") String sampleQueueName) {
 		Queue queue = new Queue(
 				sampleQueueName,
-				Boolean.valueOf(SAMPLE_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
+				valueOf(SAMPLE_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
-				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
+				valueOf(SAMPLE_AUTO_DELETE) // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
 		);
 		queue.addArgument("x-dead-letter-exchange", SAMPLE_EXCHANGE_DLX_NAME);
 		return queue;
@@ -43,7 +48,7 @@ public class SampleQueueConfig {
 //		);
 		return new FanoutExchange(
 				SAMPLE_EXCHANGE_NAME,
-				Boolean.valueOf(SAMPLE_DURABLE),
+				valueOf(SAMPLE_DURABLE),
 				false
 		);
 	}
@@ -56,12 +61,12 @@ public class SampleQueueConfig {
 
 
 	@Bean(name = "sampleQueueDlx")
-	Queue sampleQueueDlx(@Value("#{sampleQueueDlxName}") String sampleQueueDlxName) {
+	Queue sampleQueueDlx() {
 		return new Queue(
-				sampleQueueDlxName,
-				Boolean.valueOf(SAMPLE_DLX_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
+				SAMPLE_QUEUE_DLX_NAME,
+				valueOf(SAMPLE_DLX_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
-				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
+				valueOf(SAMPLE_DLX_AUTO_DELETE) // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
 		);
 	}
 
@@ -69,7 +74,7 @@ public class SampleQueueConfig {
 	FanoutExchange sampleExchangeDlx() {
 		return new FanoutExchange(
 				SAMPLE_EXCHANGE_DLX_NAME,
-				Boolean.valueOf(SAMPLE_DLX_DURABLE),
+				valueOf(SAMPLE_DLX_DURABLE),
 				false
 		);
 	}
@@ -89,11 +94,6 @@ public class SampleQueueConfig {
 	@Bean
 	public String sampleQueueName() throws UnknownHostException {
 		return SAMPLE_QUEUE_BASE_NAME + localServerIp();
-	}
-
-	@Bean
-	public String sampleQueueDlxName() throws UnknownHostException {
-		return SAMPLE_QUEUE_DLX_BASE_NAME + localServerIp();
 	}
 
 }

@@ -1,8 +1,12 @@
 package seol.study.amqp.consumer;
 
+import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_AUTO_DELETE;
+import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_DLX_AUTO_DELETE;
+import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_DLX_DURABLE;
 import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_DURABLE;
 import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_EXCHANGE_DLX_NAME;
 import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_EXCHANGE_NAME;
+import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_QUEUE_DLX_NAME;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
@@ -23,14 +27,19 @@ public class SampleListener {
 
 	@RabbitListener(
 			bindings = @QueueBinding(
-					value = @Queue(value = "#{sampleQueueName}", durable = SAMPLE_DURABLE, arguments = {
-							@Argument(name = "x-dead-letter-exchange", value = SAMPLE_EXCHANGE_DLX_NAME),
-					}),
+					value = @Queue(
+							value = "#{sampleQueueName}",
+							durable = SAMPLE_DURABLE,
+							autoDelete = SAMPLE_AUTO_DELETE,
+							arguments = {
+									@Argument(name = "x-dead-letter-exchange", value = SAMPLE_EXCHANGE_DLX_NAME),
+							}
+					),
 					exchange = @Exchange(value = SAMPLE_EXCHANGE_NAME, type = ExchangeTypes.FANOUT)
 			)
 	)
 	public void receiveMessage(final Message message) throws Exception {
-		log.info("message.getBody()={}", new String(message.getBody()));
+		log.info("[receiveMessage] message.getBody()={}", new String(message.getBody()));
 		if (++index % 2 == 0) {
 			// 메시지 소비 실패.
 			// AmqpRejectAndDontRequeueException을 발생시키면 Reject되면서 다시 Queue에 들어가지 않는다.
@@ -39,7 +48,22 @@ public class SampleListener {
 			throw new AmqpRejectAndDontRequeueException("실패처리. Reject And Don't Requeue Exception");
 		}
 
-		log.info("메시지 소비 성공");
+		log.info("[receiveMessage] 메시지 소비 성공");
+	}
+
+	@RabbitListener(
+			bindings = @QueueBinding(
+					value = @Queue(
+							value = SAMPLE_QUEUE_DLX_NAME,
+							durable = SAMPLE_DLX_DURABLE,
+							autoDelete = SAMPLE_DLX_AUTO_DELETE
+					),
+					exchange = @Exchange(value = SAMPLE_EXCHANGE_DLX_NAME, type = ExchangeTypes.FANOUT)
+			)
+	)
+	public void receiveDlxMessage(final Message message) throws Exception {
+		log.info("[receiveDlxMessage] message.getBody()={}", new String(message.getBody()));
+		log.info("[receiveDlxMessage] 메시지 소비 성공");
 	}
 
 }
