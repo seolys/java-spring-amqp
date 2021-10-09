@@ -1,7 +1,6 @@
 package seol.study.amqp.producer;
 
 import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_EXCHANGE_NAME;
-import static seol.study.amqp.producer.SampleQueueConfig.SAMPLE_ROUTING_KEY;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,9 @@ public class SampleController {
 		if (ObjectUtils.isEmpty(message)) {
 			throw new IllegalArgumentException("message is empty");
 		}
+
 		log.info("message={}", message);
-		rabbitTemplate.convertAndSend(SAMPLE_EXCHANGE_NAME, SAMPLE_ROUTING_KEY, message);
+		rabbitTemplate.convertAndSend(SAMPLE_EXCHANGE_NAME, null, message);
 		return "message sending!";
 	}
 }

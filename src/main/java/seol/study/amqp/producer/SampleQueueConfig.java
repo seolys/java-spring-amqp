@@ -1,10 +1,13 @@
 package seol.study.amqp.producer;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,13 +15,11 @@ import org.springframework.context.annotation.Configuration;
 public class SampleQueueConfig {
 
 	public static final String SAMPLE_EXCHANGE_NAME = "sample.exchange";
-	public static final String SAMPLE_QUEUE_NAME = "sample.queue";
-	public static final String SAMPLE_ROUTING_KEY = "sample.queue";
+	public static final String SAMPLE_QUEUE_BASE_NAME = "sample.queue.";
 	public static final String SAMPLE_DURABLE = "true";
 
 	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.exchange.dlx";
-	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.queue.dlx";
-	public static final String SAMPLE_ROUTING_DLX_KEY = "sample.queue.dlx";
+	public static final String SAMPLE_QUEUE_DLX_BASE_NAME = "sample.queue.dlx.";
 	public static final String SAMPLE_DLX_DURABLE = "true";
 
 	/**
@@ -26,15 +27,14 @@ public class SampleQueueConfig {
 	 * 서로 다른 이름으로 여러개의 Queue를 등록할 수도 있습니다.
 	 */
 	@Bean(name = "sampleQueue")
-	Queue sampleQueue() {
+	Queue sampleQueue(@Value("#{sampleQueueName}") String sampleQueueName) {
 		Queue queue = new Queue(
-				SAMPLE_QUEUE_NAME,
+				sampleQueueName,
 				Boolean.valueOf(SAMPLE_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
 				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
 		);
 		queue.addArgument("x-dead-letter-exchange", SAMPLE_EXCHANGE_DLX_NAME);
-		queue.addArgument("x-dead-letter-routing-key", SAMPLE_ROUTING_DLX_KEY);
 		return queue;
 	}
 
@@ -44,8 +44,13 @@ public class SampleQueueConfig {
 	 * 설정할 수 있는 Exchange에는 Direct, Fanout, Topic, Headers가 있습니다.
 	 */
 	@Bean(name = "sampleExchange")
-	TopicExchange sampleExchange() {
-		return new TopicExchange(
+	FanoutExchange sampleExchange() {
+//		return new TopicExchange(
+//				SAMPLE_EXCHANGE_NAME,
+//				Boolean.valueOf(SAMPLE_DURABLE),
+//				false
+//		);
+		return new FanoutExchange(
 				SAMPLE_EXCHANGE_NAME,
 				Boolean.valueOf(SAMPLE_DURABLE),
 				false
@@ -57,17 +62,16 @@ public class SampleQueueConfig {
 	 * 빈으로 등록한 Queue와 Exchange를 바인딩하면서 Exchange에서 사용될 패턴을 설정해 주었습니다.
 	 */
 	@Bean(name = "sampleBinding")
-	Binding sampleBinding(@Qualifier("sampleQueue") Queue queue, @Qualifier("sampleExchange") TopicExchange exchange) {
+	Binding sampleBinding(@Qualifier("sampleQueue") Queue queue, @Qualifier("sampleExchange") FanoutExchange exchange) {
 		return BindingBuilder.bind(queue)
-				.to(exchange)
-				.with(SAMPLE_ROUTING_KEY);
+				.to(exchange);
 	}
 
 
 	@Bean(name = "sampleQueueDlx")
-	Queue sampleQueueDlx() {
+	Queue sampleQueueDlx(@Value("#{sampleQueueDlxName}") String sampleQueueDlxName) {
 		return new Queue(
-				SAMPLE_QUEUE_DLX_NAME,
+				sampleQueueDlxName,
 				Boolean.valueOf(SAMPLE_DLX_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
 				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
@@ -75,8 +79,8 @@ public class SampleQueueConfig {
 	}
 
 	@Bean(name = "sampleExchangeDlx")
-	TopicExchange sampleExchangeDlx() {
-		return new TopicExchange(
+	FanoutExchange sampleExchangeDlx() {
+		return new FanoutExchange(
 				SAMPLE_EXCHANGE_DLX_NAME,
 				Boolean.valueOf(SAMPLE_DLX_DURABLE),
 				false
@@ -84,10 +88,25 @@ public class SampleQueueConfig {
 	}
 
 	@Bean(name = "sampleBindingDlx")
-	Binding sampleBindingDlx(@Qualifier("sampleQueueDlx") Queue queue, @Qualifier("sampleExchangeDlx") TopicExchange exchange) {
+	Binding sampleBindingDlx(@Qualifier("sampleQueueDlx") Queue queue, @Qualifier("sampleExchangeDlx") FanoutExchange exchange) {
 		return BindingBuilder.bind(queue)
-				.to(exchange)
-				.with(SAMPLE_ROUTING_DLX_KEY);
+				.to(exchange);
+	}
+
+	@Bean
+	public String localServerIp() throws UnknownHostException {
+		InetAddress ip = InetAddress.getLocalHost();
+		return ip.getHostAddress();
+	}
+
+	@Bean
+	public String sampleQueueName() throws UnknownHostException {
+		return SAMPLE_QUEUE_BASE_NAME + localServerIp();
+	}
+
+	@Bean
+	public String sampleQueueDlxName() throws UnknownHostException {
+		return SAMPLE_QUEUE_DLX_BASE_NAME + localServerIp();
 	}
 
 }
