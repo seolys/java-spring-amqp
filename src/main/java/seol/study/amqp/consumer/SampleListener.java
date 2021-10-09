@@ -38,7 +38,7 @@ public class SampleListener {
 					exchange = @Exchange(value = SAMPLE_EXCHANGE_NAME, type = ExchangeTypes.FANOUT)
 			)
 	)
-	public void receiveMessage(final Message message) throws Exception {
+	public void receiveMessage(final Message message) {
 		log.info("[receiveMessage] message.getBody()={}", new String(message.getBody()));
 		if (++index % 2 == 0) {
 			// 메시지 소비 실패.
@@ -61,7 +61,7 @@ public class SampleListener {
 					exchange = @Exchange(value = SAMPLE_EXCHANGE_DLX_NAME, type = ExchangeTypes.FANOUT)
 			)
 	)
-	public void receiveDlxMessage(final Message message) throws Exception {
+	public void receiveDlxMessage(final Message message) {
 		log.info("[receiveDlxMessage] message.getBody()={}", new String(message.getBody()));
 		log.info("[receiveDlxMessage] 메시지 소비 성공");
 	}
