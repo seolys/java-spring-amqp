@@ -46,7 +46,23 @@ public class SampleListener {
 			// Reject처리 후 DLQ로 보낼지 여부는 RabbitMQ Queue의 x-dead-letter-exchange(+ x-dead-letter-routing-key) 설정에 따라간다.
 			throw new AmqpRejectAndDontRequeueException("실패처리. Reject And Don't Requeue Exception");
 		}
-		
+
 		log.info("메시지 소비 성공");
 	}
+
+//	@RabbitListener(
+//			bindings = @QueueBinding(
+//					value = @Queue(
+//							value = SAMPLE_QUEUE_DLX_NAME,
+//							durable = SAMPLE_DLX_DURABLE,
+//							autoDelete = SAMPLE_DLX_AUTO_DELETE
+//					),
+//					exchange = @Exchange(value = SAMPLE_EXCHANGE_DLX_NAME, type = ExchangeTypes.FANOUT)
+//			)
+//	)
+//	public void receiveDlxMessage(final Message message) {
+//		log.info("[receiveDlxMessage] message.getBody()={}", new String(message.getBody()));
+//		log.info("[receiveDlxMessage] 메시지 소비 성공");
+//	}
+
 }

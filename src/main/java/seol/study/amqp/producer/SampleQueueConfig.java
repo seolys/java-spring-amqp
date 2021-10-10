@@ -1,5 +1,7 @@
 package seol.study.amqp.producer;
 
+import static java.lang.Boolean.valueOf;
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -15,11 +17,14 @@ public class SampleQueueConfig {
 	public static final String SAMPLE_QUEUE_NAME = "sample.topic.queue";
 	public static final String SAMPLE_ROUTING_KEY = "sample.topic.queue";
 	public static final String SAMPLE_DURABLE = "true";
+	public static final String SAMPLE_AUTO_DELETE = "true";
 
 	public static final String SAMPLE_EXCHANGE_DLX_NAME = "sample.topic.exchange.dlx";
 	public static final String SAMPLE_QUEUE_DLX_NAME = "sample.topic.queue.dlx";
 	public static final String SAMPLE_ROUTING_DLX_KEY = "sample.topic.queue.dlx";
 	public static final String SAMPLE_DLX_DURABLE = "true";
+	public static final String SAMPLE_DLX_AUTO_DELETE = "false";
+
 
 	/**
 	 * 지정된 이름으로 Queue를 등록합니다.
@@ -29,9 +34,9 @@ public class SampleQueueConfig {
 	Queue sampleQueue() {
 		Queue queue = new Queue(
 				SAMPLE_QUEUE_NAME,
-				Boolean.valueOf(SAMPLE_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
+				valueOf(SAMPLE_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
-				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
+				valueOf(SAMPLE_AUTO_DELETE) // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
 		);
 		queue.addArgument("x-dead-letter-exchange", SAMPLE_EXCHANGE_DLX_NAME);
 		queue.addArgument("x-dead-letter-routing-key", SAMPLE_ROUTING_DLX_KEY);
@@ -47,7 +52,7 @@ public class SampleQueueConfig {
 	TopicExchange sampleExchange() {
 		return new TopicExchange(
 				SAMPLE_EXCHANGE_NAME,
-				Boolean.valueOf(SAMPLE_DURABLE),
+				valueOf(SAMPLE_DURABLE),
 				false
 		);
 	}
@@ -68,9 +73,9 @@ public class SampleQueueConfig {
 	Queue sampleQueueDlx() {
 		return new Queue(
 				SAMPLE_QUEUE_DLX_NAME,
-				Boolean.valueOf(SAMPLE_DLX_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
+				valueOf(SAMPLE_DLX_DURABLE), // Durable: 대기열을 유지할지를 정할 플래그
 				false, // Exclusive: 선언된 연결에 의해서만 사용할지 정할 플래그
-				false // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
+				valueOf(SAMPLE_DLX_AUTO_DELETE) // Auto-Delete : 더 이상 사용되지 않는 큐를 삭제할지 정할 플래그
 		);
 	}
 
@@ -78,7 +83,7 @@ public class SampleQueueConfig {
 	TopicExchange sampleExchangeDlx() {
 		return new TopicExchange(
 				SAMPLE_EXCHANGE_DLX_NAME,
-				Boolean.valueOf(SAMPLE_DLX_DURABLE),
+				valueOf(SAMPLE_DLX_DURABLE),
 				false
 		);
 	}
